@@ -22,13 +22,6 @@ public class ClientService {
 	@Autowired
 	private ClientRepository repository;
 	
-	/* Exemplo de lambda do List
-	@Transactional(readOnly = true)
-	public List<ClientDTO> findAll() {
-		List<Client> list = repository.findAll();
-		return list.stream().map(x -> new ClientDTO(x)).collect(Collectors.toList());
-	}*/
-	
 	@Transactional(readOnly = true)
 	public Page<ClientDTO> findAllPaged(PageRequest pageRequest) {
 		Page<Client> list = repository.findAll(pageRequest);
@@ -43,7 +36,7 @@ public class ClientService {
 	@Transactional
 	public ClientDTO insert(ClientDTO dto) {
 		Client entity = new Client();
-		entity.setName(dto.getName());
+		copyDtoToEntity(dto, entity);
 		entity = repository.save(entity);
 		return new ClientDTO(entity);
 	}
@@ -52,7 +45,7 @@ public class ClientService {
 	public ClientDTO update(long id, ClientDTO dto) {
 		try {
 			Client entity = repository.getById(id);
-			entity.setName(dto.getName());
+			copyDtoToEntity(dto, entity);
 			entity = repository.save(entity);
 			return new ClientDTO(entity);
 		}catch(EntityNotFoundException e) {
@@ -69,6 +62,16 @@ public class ClientService {
 		}catch(DataIntegrityViolationException e) {
 			throw new DatabaseException("Integrity violation ");
 		}
+	}
+	
+	private void copyDtoToEntity(ClientDTO dto, Client entity) {
+		
+		entity.setBirthDate(dto.getBirthDate());
+		entity.setChildren(dto.getChildren());
+		entity.setCpf(dto.getCpf());
+		entity.setIncome(dto.getIncome());
+		entity.setName(dto.getName());
+		
 	}
 	
 }
